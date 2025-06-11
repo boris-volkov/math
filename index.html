@@ -39,8 +39,15 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    -webkit-tap-highlight-color: transparent;
   }
 
+@media (hover: hover) and (pointer: fine) {
+  button:hover {
+    background: #444; /* or your preferred hover color */
+  }
+}
+	
   button:active {
     background: #666;
   }
