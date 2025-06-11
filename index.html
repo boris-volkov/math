@@ -51,6 +51,9 @@
   button:active {
     background: #666;
   }
+button.pressed {
+  background: #666;
+}
 
 button:focus {
   outline: none;
@@ -264,6 +267,12 @@ button:focus {
   renderAnswerButtons();
   pickRandomQuestion();
   updateStats();
+
+  document.querySelectorAll("button").forEach(btn => {
+  btn.addEventListener("touchstart", () => btn.classList.add("pressed"));
+  btn.addEventListener("touchend", () => btn.classList.remove("pressed"));
+  btn.addEventListener("touchcancel", () => btn.classList.remove("pressed"));
+});
 </script>
 </body>
 </html>
