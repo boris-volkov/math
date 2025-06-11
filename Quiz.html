@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Trig Unit Circle Quiz</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #121212;
+    color: #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+  }
+  h1 {
+    margin-bottom: 0.25em;
+  }
+  #question {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    min-height: 2.4em;
+  }
+  #answerGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 120px);
+    grid-template-rows: repeat(4, 50px);
+    gap: 0.6rem;
+  }
+  button {
+    font-size: 1.3rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    background: #222;
+    color: #eee;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button:hover {
+    background: #444;
+  }
+  button:active {
+    background: #666;
+  }
+  #negToggle {
+    font-weight: bold;
+    font-size: 2rem;
+    background: #222;
+    color: #eee;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  #negToggle.active {
+    background-color: #4caf50;
+    color: white;
+  }
+  #feedback {
+    margin-top: 1rem;
+    height: 1.6rem;
+    font-weight: bold;
+  }
+  #stats {
+    margin-top: 1rem;
+    font-size: 1rem;
+    color: #ccc;
+  }
+</style>
+
+<!-- KaTeX CSS -->
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css"
+/>
+</head>
+<body>
+
+<div id="question"></div>
+
+<div id="answerGrid">
+  <button id="negToggle" title="Toggle negative">−</button>
+  <!-- Answer buttons will be appended here -->
+</div>
+
+<div id="feedback"></div>
+<div id="stats"></div>
+
+<!-- KaTeX JS -->
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.js"></script>
+
+<script>
+  // Questions for full unit circle with all 16 standard angles
+  const questions = [
+    { label: "0", rad: "0", sin: "0", cos: "1", tan: "0", sec: "1", csc: "undef", cot: "undef", answer: "" },
+    { label: "π/6", rad: "\\frac{\\pi}{6}", sin: "\\frac{1}{2}", cos: "\\frac{\\sqrt{3}}{2}", tan: "\\frac{\\sqrt{3}}{3}", sec: "\\frac{2\\sqrt{3}}{3}", csc: "2", cot: "\\sqrt{3}" },
+    { label: "π/4", rad: "\\frac{\\pi}{4}", sin: "\\frac{\\sqrt{2}}{2}", cos: "\\frac{\\sqrt{2}}{2}", tan: "1", sec: "\\sqrt{2}", csc: "\\sqrt{2}", cot: "1" },
+    { label: "π/3", rad: "\\frac{\\pi}{3}", sin: "\\frac{\\sqrt{3}}{2}", cos: "\\frac{1}{2}", tan: "\\sqrt{3}", sec: "2", csc: "\\frac{2\\sqrt{3}}{3}", cot: "\\frac{\\sqrt{3}}{3}" },
+    { label: "π/2", rad: "\\frac{\\pi}{2}", sin: "1", cos: "0", tan: "undef", sec: "undef", csc: "1", cot: "0" },
+    { label: "2\\pi/3", rad: "\\frac{2\\pi}{3}", sin: "\\frac{\\sqrt{3}}{2}", cos: "-\\frac{1}{2}", tan: "-\\sqrt{3}", sec: "-2", csc: "\\frac{2\\sqrt{3}}{3}", cot: "-\\frac{\\sqrt{3}}{3}" },
+    { label: "3\\pi/4", rad: "\\frac{3\\pi}{4}", sin: "\\frac{\\sqrt{2}}{2}", cos: "-\\frac{\\sqrt{2}}{2}", tan: "-1", sec: "-\\sqrt{2}", csc: "\\sqrt{2}", cot: "-1" },
+    { label: "5\\pi/6", rad: "\\frac{5\\pi}{6}", sin: "\\frac{1}{2}", cos: "-\\frac{\\sqrt{3}}{2}", tan: "-\\frac{\\sqrt{3}}{3}", sec: "-\\frac{2\\sqrt{3}}{3}", csc: "2", cot: "-\\sqrt{3}" },
+    { label: "\\pi", rad: "\\pi", sin: "0", cos: "-1", tan: "0", sec: "-1", csc: "undef", cot: "undef" },
+    { label: "7\\pi/6", rad: "\\frac{7\\pi}{6}", sin: "-\\frac{1}{2}", cos: "-\\frac{\\sqrt{3}}{2}", tan: "\\frac{\\sqrt{3}}{3}", sec: "-\\frac{2\\sqrt{3}}{3}", csc: "-2", cot: "\\sqrt{3}" },
+    { label: "5\\pi/4", rad: "\\frac{5\\pi}{4}", sin: "-\\frac{\\sqrt{2}}{2}", cos: "-\\frac{\\sqrt{2}}{2}", tan: "1", sec: "-\\sqrt{2}", csc: "-\\sqrt{2}", cot: "1" },
+    { label: "4\\pi/3", rad: "\\frac{4\\pi}{3}", sin: "-\\frac{\\sqrt{3}}{2}", cos: "-\\frac{1}{2}", tan: "\\sqrt{3}", sec: "-2", csc: "-\\frac{2\\sqrt{3}}{3}", cot: "\\frac{\\sqrt{3}}{3}" },
+    { label: "3\\pi/2", rad: "\\frac{3\\pi}{2}", sin: "-1", cos: "0", tan: "undef", sec: "undef", csc: "-1", cot: "0" },
+    { label: "5\\pi/3", rad: "\\frac{5\\pi}{3}", sin: "-\\frac{\\sqrt{3}}{2}", cos: "\\frac{1}{2}", tan: "-\\sqrt{3}", sec: "2", csc: "-\\frac{2\\sqrt{3}}{3}", cot: "-\\frac{\\sqrt{3}}{3}" },
+    { label: "7\\pi/4", rad: "\\frac{7\\pi}{4}", sin: "-\\frac{\\sqrt{2}}{2}", cos: "\\frac{\\sqrt{2}}{2}", tan: "-1", sec: "\\sqrt{2}", csc: "-\\sqrt{2}", cot: "-1" },
+    { label: "11\\pi/6", rad: "\\frac{11\\pi}{6}", sin: "-\\frac{1}{2}", cos: "\\frac{\\sqrt{3}}{2}", tan: "-\\frac{\\sqrt{3}}{3}", sec: "\\frac{2\\sqrt{3}}{3}", csc: "-2", cot: "-\\sqrt{3}" }
+  ];
+
+  const functionsList = ["sin", "cos", "tan", "sec", "csc", "cot"];
+
+  // Globals
+  let currentQuestion = null;
+  let negActive = false;
+  let correctCount = 0;
+  let totalCount = 0;
+  let startTime = null;
+
+  // Elements
+  const questionDiv = document.getElementById("question");
+  const answerGrid = document.getElementById("answerGrid");
+  const negToggle = document.getElementById("negToggle");
+  const feedbackDiv = document.getElementById("feedback");
+  const statsDiv = document.getElementById("stats");
+
+  // Store answer buttons for easy updates
+  let answerButtons = [];
+
+  function negateAnswer(ans) {
+    if (ans === "undef") return "undef";
+    // If already negative, remove negative sign (handle \\-)
+    if (ans.startsWith("-")) {
+      return ans.slice(1);
+    } else {
+      return "-" + ans;
+    }
+  }
+
+  // Create answer buttons grid: 11 answer buttons + 1 toggle = 12 total
+
+
+	function createAnswerButtons() {
+		// Remove old buttons
+		answerButtons.forEach(btn => btn.remove());
+		answerButtons = [];
+
+		// Canonical answers (positive-only), to display in buttons
+		const canonicalAnswers = [
+			"0",
+			"1",
+			"\\frac{1}{2}",
+			"\\frac{\\sqrt{2}}{2}",
+			"\\frac{\\sqrt{3}}{2}",
+			"\\frac{\\sqrt{3}}{3}",
+			"\\sqrt{2}",
+			"\\sqrt{3}",
+			"2",
+			"\\frac{2\\sqrt{3}}{3}",
+			"undef"
+		];
+
+		// Create buttons
+		canonicalAnswers.forEach(ans => {
+			const btn = document.createElement("button");
+			btn.className = "answerBtn";
+			btn.dataset.answer = ans;
+			btn.title = ans === "undef" ? "undef" : "";
+			btn.addEventListener("click", () => onAnswerClick(ans));
+			answerGrid.appendChild(btn);
+			answerButtons.push(btn);
+		});
+	}
+
+
+  function renderAnswerButtons() {
+    startTime = performance.now();
+    answerButtons.forEach(btn => {
+      btn.innerHTML = "";
+      try {
+        katex.render(btn.dataset.answer, btn, { throwOnError: false });
+      } catch {
+        btn.textContent = btn.dataset.answer;
+      }
+    });
+  }
+
+  function pickRandomQuestion() {
+    const angle = questions[Math.floor(Math.random() * questions.length)];
+    const fn = functionsList[Math.floor(Math.random() * functionsList.length)];
+    currentQuestion = {
+      questionText: `${fn}\\left(${angle.rad}\\right)`,
+      answer: angle[fn]
+    };
+
+    // Render question
+    questionDiv.innerHTML = "";
+    try {
+      katex.render(currentQuestion.questionText, questionDiv, { throwOnError: false });
+    } catch {
+      questionDiv.textContent = currentQuestion.questionText;
+    }
+
+    // Clear feedback
+    feedbackDiv.textContent = "";
+  }
+
+  function updateStats() {
+    const now = performance.now();
+    const elapsedSeconds = (now - startTime) / 1000;
+    const avgQpm = totalCount === 0 ? 0 : ((correctCount / elapsedSeconds) * 60).toFixed(1);
+    statsDiv.innerHTML = `Correct: ${correctCount} / Total: ${totalCount} <br> Average speed: ${avgQpm} correct questions/min`;
+  }
+
+  function onAnswerClick(answer) {
+    // Apply negation only if toggle active and answer is not undef
+    let userAnswer = negActive && answer !== "undef" ? negateAnswer(answer) : answer;
+
+    if (userAnswer === currentQuestion.answer) {
+      feedbackDiv.textContent = "✓ Correct!";
+      feedbackDiv.style.color = "#4caf50";
+      correctCount++;
+      totalCount++;
+      updateStats();
+
+      setTimeout(() => {
+        pickRandomQuestion();
+        negActive = false;
+        negToggle.classList.remove("active");
+      }, 200);
+    } else {
+      feedbackDiv.textContent = "✗ Try again";
+      feedbackDiv.style.color = "#f44336";
+      totalCount++;
+      updateStats();
+    }
+  }
+
+  // Neg toggle button click
+  negToggle.addEventListener("click", () => {
+    negActive = !negActive;
+    negToggle.classList.toggle("active", negActive);
+  });
+
+  // Initialize everything
+  createAnswerButtons();
+  renderAnswerButtons();
+  pickRandomQuestion();
+  updateStats();
+</script>
+</body>
+</html>
+
