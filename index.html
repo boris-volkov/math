@@ -46,6 +46,11 @@
   button:active {
     background: #666;
   }
+
+button:focus {
+  outline: none;
+}
+	
   #negToggle {
     font-weight: bold;
     font-size: 2rem;
@@ -169,7 +174,10 @@
 			btn.className = "answerBtn";
 			btn.dataset.answer = ans;
 			btn.title = ans === "undef" ? "undef" : "";
-			btn.addEventListener("click", () => onAnswerClick(ans));
+			btn.addEventListener("click", (e) => {
+				e.currentTarget.blur(); // Prevent button from staying focused on mobile
+  				onAnswerClick(ans);
+			});
 			answerGrid.appendChild(btn);
 			answerButtons.push(btn);
 		});
@@ -240,10 +248,11 @@
   }
 
   // Neg toggle button click
-  negToggle.addEventListener("click", () => {
-    negActive = !negActive;
-    negToggle.classList.toggle("active", negActive);
-  });
+	negToggle.addEventListener("click", (e) => {
+	  e.currentTarget.blur(); // Prevent mobile highlight stickiness
+	  negActive = !negActive;
+	  negToggle.classList.toggle("active", negActive);
+	});
 
   // Initialize everything
   createAnswerButtons();
