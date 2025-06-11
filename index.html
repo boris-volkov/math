@@ -228,7 +228,7 @@ button:focus {
     const now = performance.now();
     const elapsedSeconds = (now - startTime) / 1000;
     const avgQpm = totalCount === 0 ? 0 : ((correctCount / elapsedSeconds) * 60).toFixed(1);
-    statsDiv.innerHTML = `Correct: ${correctCount} / Total: ${totalCount} <br> Average speed: ${avgQpm} correct questions/min`;
+    statsDiv.innerHTML = `Correct: ${correctCount} / Total: ${totalCount} <br> speed: ${avgQpm} per min`;
   }
 
   function onAnswerClick(answer) {
@@ -246,7 +246,7 @@ button:focus {
         pickRandomQuestion();
         negActive = false;
         negToggle.classList.remove("active");
-      }, 200);
+      }, 300);
     } else {
       feedbackDiv.textContent = "✗ Try again";
       feedbackDiv.style.color = "#f44336";
